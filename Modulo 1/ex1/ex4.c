@@ -3,53 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define INT_BIT sizeof(int) * 8
 #define MAX_LINE_SIZE 1024
-
-int countBits(int val) {
-    int mask = 1;
-
-    int countZero = 0;
-    int countOne = 0;
-    
-    int n;
-    for(int i = 0, n = val; i < INT_BIT; i++, n >>= 1) {
-        int bit = n && mask;
-        if(bit) {
-            countOne++;
-        } else {
-            countZero++;
-        }
-    }
-
-    printf("Number of zeros: %d\n", countZero);
-    printf("Number of ones: %d\n", countOne);
-}
-
-int file_symbol_freq( char *file_name, char symbol ) {
-    FILE * f = fopen(file_name, "r");
-
-    char line[MAX_LINE_SIZE];
-    double total_file_size = 0.0;
-    double symbol_count = 0.0;
-    while(fgets(line, MAX_LINE_SIZE, f) != NULL) {
-        for(int i = 0; i < strlen(line); i++) {
-            if(line[i] == symbol) {
-                symbol_count++;
-            }
-            total_file_size++;
-        }
-    }
-
-    fclose(f);
-
-    if(symbol_count == 0.0) {
-        return -1;
-    }
-
-    return (symbol_count/total_file_size) * 100;
-}
-
 
 typedef struct symbol {
     char s;
@@ -132,39 +86,8 @@ void file_histogram(char * file_name) {
     free_list(head);
 }
 
-
-void reverse_file(char *input_file_name, char *output_file_name) {
-    FILE *input_file = fopen(input_file_name, "r");
-    FILE *output_file = fopen(output_file_name, "w");
-
-    fseek(input_file, 0, SEEK_END);
-
-    long input_file_size = ftell(input_file);
-
-    for (long i = input_file_size - 1; i >= 0; i--) {
-        fseek(input_file, i, SEEK_SET);
-
-        char ch = fgetc(input_file);
-
-        fputc(ch, output_file);
-    }
-
-    fclose(input_file);
-    fclose(output_file);
-
-    printf("File reversed successfully.\n");
-}
-
 int main() {
-    countBits(15);
-
-    printf("Symbol freq: %d\n", file_symbol_freq("test.txt", 'c'));
-
     file_histogram("test.txt");
-
-    char input_file_name[] = "input.txt";
-    char output_file_name[] = "output.txt";
-    reverse_file(input_file_name, output_file_name);
 
     return 0;
 }
