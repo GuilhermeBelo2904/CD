@@ -1,4 +1,5 @@
 from collections import Counter
+from ex2 import symbol_frequency
 
 
 def symbols_with_higher_frequency(filename, percentage_threshold):
@@ -13,7 +14,7 @@ def symbols_with_higher_frequency(filename, percentage_threshold):
 
 
 # test:
-filename = 'text.txt'
+filename = 'barries.jpg'
 percentage = 20  # 5%
 symbols = symbols_with_higher_frequency(filename, percentage)
 
