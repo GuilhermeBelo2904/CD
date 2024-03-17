@@ -1,0 +1,1 @@
+   # Check the file extension to determine if it's a text file or a binary file
