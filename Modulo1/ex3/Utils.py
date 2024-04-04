@@ -1,7 +1,7 @@
 import math
 import sys
 import os
-sys.path.insert(1, os.path.join(os.getcwd(), "ex2"))
+sys.path.insert(1, os.path.join(os.getcwd(), "Modulo1", "ex2"))
 from symbol_frequency import symbols_with_higher_frequency as swhf # type: ignore
 
 def symbols_frequency(file_path):

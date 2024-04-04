@@ -60,7 +60,7 @@ def get_test_file_names(path):
 
 # Get the current directory
 current_directory = os.getcwd()
-relative_path = os.path.join("ex3", "TestFilesCD")
+relative_path = os.path.join("Modulo1", "ex3", "TestFilesCD")
 
 # Fuse the current directory with the relative path
 path = os.path.join(current_directory, relative_path)
