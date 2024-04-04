@@ -1,1 +1,2 @@
-   # Check the file extension to determine if it's a text file or a binary file
+sys.path.insert(1, os.path.join(os.getcwd(), "ex2"))
+from symbol_frequency import symbols_with_higher_frequency
