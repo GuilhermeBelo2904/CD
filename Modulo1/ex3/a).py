@@ -1,82 +1,55 @@
-import math
 import matplotlib.pyplot as plt
 import os
-from collections import Counter    
-    
-class Symbol:
-    def __init__(self, symbol, frequency):
-        self.symbol = symbol
-        self.frequency = frequency
-
-    def __str__(self):
-        return f"Symbol '{self.symbol}' has frequency {self.frequency}."
-
-def symbols_with_higher_frequency(filename, percentage_threshold):
-    with open(filename, 'rb') as file:
-        content = file.read()
-
-    symbol_count = Counter(content)
-    total_symbols = sum(symbol_count.values())
-    percentage_count = total_symbols * (percentage_threshold / 100)
-    symbols_above_percentage = [Symbol(symbol, count) for symbol, count in symbol_count.items() if count > percentage_count]
-    
-    return symbols_above_percentage
-
-    
-def entropy(symbol_list):
-    entropy_value = 0
-    total_frequency = sum(symbol.frequency for symbol in symbol_list)
-    for symbol in symbol_list:
-        probability = symbol.frequency / total_frequency
-        entropy_value += probability * math.log2(probability)
-    return -entropy_value
-
-def self_information(symbol, total_frequency):
-    probability = symbol.frequency / total_frequency
-    return math.log2(1/probability)
-  
-def print_entropy(symbol_list):
-    print(f"Entropy: {entropy(symbol_list)}")
-        
-def print_self_information(symbol, total_frequency):  
-    print(f"Self-information of {symbol.symbol}: {self_information(symbol, total_frequency)}")
-
-def show_histogram(symbols, frequencies):
-    plt.bar(symbols, frequencies)
+from Utils import self_information
+from Utils import entropy
+from Utils import symbols_frequency
+   
+def show_histogram(file_name, symbols, occurrences, entropy_value):
+    plt.figure(figsize=(10, 6))
+    plt.bar(symbols, occurrences)
+    plt.title(f'File: {file_name}, Entropy: {entropy_value}')
     plt.xlabel('Symbols')
-    plt.ylabel('Frequency')
-    plt.title('Symbol Frequency Histogram')
+    plt.ylabel('Occurrences')
     plt.show()
-                 
-def print_symbols_info(file_names, relative_path):
-  total_frequency = 0
-  symbol_list = []
-  for file_name in file_names:
-      f = os.path.join(relative_path, file_name)
-      
-      l = symbols_with_higher_frequency(f, 0)
-      for symbol in l:
-          if symbol.symbol not in [s.symbol for s in symbol_list]:
-              symbol_list.append(symbol)
-          else:
-              for s in symbol_list:
-                  if s.symbol == symbol.symbol:
-                      s.frequency += symbol.frequency
-                      break    
-      
-      total_frequency += sum(symbol.frequency for symbol in symbol_list)
-  
-  symbols = []
-  frequencies = []
-  for symbol in symbol_list:
-      print_self_information(symbol, total_frequency) 
-      symbols.append(symbol.symbol)
-      frequencies.append(symbol.frequency)
-  
-  show_histogram(symbols, frequencies)
-  print_entropy(symbol_list) 
+              
+def show_symbols_info(file_name, relative_path):
+    f = os.path.join(relative_path, file_name)
+    
+    symbol_list = symbols_frequency(f)
+    
+    symbols = []
+    occurrences = []
+    frequencies = []
+    for symbol in symbol_list:
+        print(f"Self-information of {symbol.symbol}: {self_information(symbol.frequency)}")
+        symbols.append(symbol.symbol)
+        occurrences.append(symbol.occurrences)
+        frequencies.append(symbol.frequency)
             
+    entropy_value = entropy(frequencies)
+    show_histogram(file_name, symbols, occurrences, entropy_value)
+      
+def symbol_info_app(file_names, relative_path):
+    while True:   
+        print("\nChoose a file to analyze or press 'E' to exit:")
+        for i, file_name in enumerate(file_names):
+            print(f"{i} - {file_name}")
+        
+        option = input("Option: ")
+        if option.upper() == 'E':
+            print("\n\nExiting...\n")
+            break
+        elif not option.isdigit() or int(option) < 0 and int(option) >= len(file_names):
+            print("\nInvalid option. Please choose a valid number.")
+            continue 
+        else:
+            option = int(option)
+            show_symbols_info(file_names[option], relative_path)   
              
+            
+  
+# ------------------------Test------------------------
+                 
 def get_test_file_names(path):
     if os.path.isdir(path):
         return os.listdir(path)
@@ -84,7 +57,6 @@ def get_test_file_names(path):
         print("Error: The provided path is not a directory.")
         return []
       
-# ------------------------Test------------------------
 
 # Get the current directory
 current_directory = os.getcwd()
@@ -95,4 +67,4 @@ path = os.path.join(current_directory, relative_path)
 
 file_names = get_test_file_names(path)
 
-print_symbols_info(file_names, relative_path)
+symbol_info_app(file_names, relative_path)
