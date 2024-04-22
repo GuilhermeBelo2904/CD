@@ -1,5 +1,4 @@
 from collections import Counter
-import os
 
 class Symbol:
     def __init__(self, symbol, occurrences, frequency):

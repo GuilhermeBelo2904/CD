@@ -19,10 +19,8 @@ class Rectangle:
 def create_key(width, height):
      return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(width * height)]
 
-def isInAreaToEncrypt(pixel, rectangle):
-    return rectangle.x <= pixel % rectangle.width < rectangle.x + rectangle.width and rectangle.y <= pixel // rectangle.width < rectangle.y + rectangle.height
     
-def vernam_cipher(pixels, pre_shared_key, rectangle=Rectangle()):
+def vernam_cipher(pixels, pre_shared_key, width, rectangle=Rectangle()):
     if len(pixels) != len(pre_shared_key):
         print("Error: The number of pixels" + "(" + str(len(pixels)) + ")" + " and the number of keys" + "(" + str(len(pre_shared_key)) + ")" + " are different.")
         return []
@@ -34,15 +32,27 @@ def vernam_cipher(pixels, pre_shared_key, rectangle=Rectangle()):
             pixel_img = pixels[i]
             pixel_key = pre_shared_key[i]
             
-            encrypted_pixel = (pixel_img[0] ^ pixel_key[0], pixel_img[1] ^ pixel_key[1], pixel_img[2] ^ pixel_key[2])
+            encrypted_pixel = (
+                pixel_img[0] ^ pixel_key[0],
+                pixel_img[1] ^ pixel_key[1],
+                pixel_img[2] ^ pixel_key[2]
+            )
             encrypted_pixels.append(encrypted_pixel)    
     else:
         for i in range(len(pixels)):
-            if isInAreaToEncrypt(i, rectangle):
+            x = i % width
+            y = i // width
+            if (
+                rectangle.x <= x < rectangle.x + rectangle.width
+                and rectangle.y <= y < rectangle.y + rectangle.height
+            ):
                 pixel_img = pixels[i]
                 pixel_key = pre_shared_key[i]
-                
-                encrypted_pixel = (pixel_img[0] ^ pixel_key[0], pixel_img[1] ^ pixel_key[1], pixel_img[2] ^ pixel_key[2])
+                encrypted_pixel = (
+                    pixel_img[0] ^ pixel_key[0],
+                    pixel_img[1] ^ pixel_key[1],
+                    pixel_img[2] ^ pixel_key[2],
+                )
                 encrypted_pixels.append(encrypted_pixel)
             else:
                 encrypted_pixels.append(pixels[i])
@@ -135,7 +145,7 @@ def Vernam_Cipher_App(file_names, relative_path):
                 
             print("Encrypting the image...")
             pre_shared_key = create_key(original_image.width, original_image.height)
-            encrypted_pixels = vernam_cipher(original_pixels, pre_shared_key, areaToEncrypt)
+            encrypted_pixels = vernam_cipher(original_pixels, pre_shared_key, original_image.width, areaToEncrypt)
 
             encrypted_image = Image.new(original_image.mode, original_image.size)
             encrypted_image.putdata(encrypted_pixels)
@@ -149,7 +159,7 @@ def Vernam_Cipher_App(file_names, relative_path):
                 option = input("Option: ")
                 if option == '1':
                     print("Decrypting the image...")
-                    decrypted_pixels = vernam_cipher(encrypted_pixels, pre_shared_key, areaToEncrypt)
+                    decrypted_pixels = vernam_cipher(encrypted_pixels, pre_shared_key, original_image.width, areaToEncrypt)
                     
                     decrypted_image = Image.new(original_image.mode, original_image.size)
                     decrypted_image.putdata(decrypted_pixels)
