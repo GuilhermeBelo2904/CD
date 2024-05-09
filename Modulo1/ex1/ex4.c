@@ -79,7 +79,7 @@ void file_histogram(char * file_name) {
 
     Node * temp = head;
     while (temp != NULL) {
-        printf("Symbol: %c, Frequency: %d\n", (temp->data)->s, (temp->data)->occ);
+        printf("Symbol: %c, Frequency of occurrence: %d\n", (temp->data)->s, (temp->data)->occ);
         temp = temp->next;
     }
 

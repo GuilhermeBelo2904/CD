@@ -20,3 +20,6 @@ def symbols_with_higher_frequency(filename, percentage_threshold = 0):
     symbols_above_percentage = [Symbol(symbol, count, count/total_symbols) for symbol, count in symbol_count.items() if count > percentage_count]
     return symbols_above_percentage
 
+
+
+

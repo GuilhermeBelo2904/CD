@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 void fibonacci(int N) {
+    printf("First %d numbers of the fibonacci sequence:\n", N);
     int n = N;
     int last1;
     int last2;
@@ -20,5 +21,5 @@ void fibonacci(int N) {
 }
 
 int main() {
-    fibonacci(5);
+    fibonacci(15);
 }
