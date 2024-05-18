@@ -8,34 +8,51 @@ from utils import repetition_code_codificator
 
 import random
 
+def ber_calculation(sequence, transmitted_sequence):
+    return sum(bit1 != bit2 for bit1, bit2 in zip(sequence, transmitted_sequence)) / len(sequence)
+
 def simulate_file_transmission_no_error_control(file, p):
+    print(f"p: {p}")
     file_content = file_to_bits(file)
     write_sequence_to_file("sequenceBits.txt", file_content)
     bsc_sequence = bsc_channel(file_content, p)
     write_sequence_to_file("received_sequence.txt", bsc_sequence)
-
+    ber_line = ber_calculation(file_content, bsc_sequence)
+    print(f"BER': {ber_line}")
     compare_files("sequenceBits.txt", "received_sequence.txt")
+    print()
 
 
 def simulate_file_transmission_repetition_code(file, p):
+    print(f"p: {p}")
     file_content = file_to_bits(file)
     write_sequence_to_file("sequenceBits.txt", file_content)
     codified_sequence = repetition_code_codificator(file_content)
     bsc_sequence = bsc_channel(codified_sequence, p)
     received_sequence = repetition_code_decoder(bsc_sequence)
     write_sequence_to_file("received_sequence.txt", received_sequence)
-
+    ber_line = ber_calculation(file_content, received_sequence)
+    print(f"BER': {ber_line}")
+    ber = ber_calculation(codified_sequence, bsc_sequence)
+    print(f"BER: {ber}")
     compare_files("sequenceBits.txt", "received_sequence.txt")
+    print()
+
 
 def simulate_file_transmission_hamming74(file, p):
+    print(f"p: {p}")
     file_content = file_to_bits(file)
     write_sequence_to_file("sequenceBits.txt", file_content)
     codified_sequence = hamming74_encode_sequence(file_content)
     bsc_sequence = bsc_channel(codified_sequence, p)
-    received_sequence = hamming74_decode_sequence(bsc_sequence)
+    received_sequence = hamming74_decode_sequence(bsc_sequence, codified_sequence)
+    ber_line = ber_calculation(file_content, received_sequence)
+    print(f"BER': {ber_line}")
+    ber = ber_calculation(codified_sequence, bsc_sequence)
+    print(f"BER: {ber}")
     write_sequence_to_file("received_sequence.txt", received_sequence)
-
     compare_files("sequenceBits.txt", "received_sequence.txt")
+    print()
 
 
 def bsc_channel(sequence, p):
@@ -65,38 +82,52 @@ def hamming74_encode_sequence(sequence):
     
     return encoded_sequence
 
-def hamming74_decode_sequence(sequence):
+def hamming74_decode_sequence(sequence, codified_sequence):
     subsequences = [sequence[i:i+7] for i in range(0, len(sequence), 7)]
+    codified_dub_sequences = [codified_sequence[i:i+7] for i in range(0, len(codified_sequence), 7)]
     decoded_sequence = ''
-    for subsequence in subsequences:
-        decoded_sequence += ''.join(map(str, hamming74_decode(list(map(int, subsequence)))))
+    for idx, subsequence in enumerate(subsequences):
+        decoded_sequence += ''.join(map(str, hamming74_decode(list(map(int, subsequence)), list(map(int, codified_dub_sequences[idx])))))
     return decoded_sequence
 
 def hamming74_encode(data):
-    p1 = data[1] ^ data[2] ^ data[3]
+    p1 = data[0] ^ data[2] ^ data[3]
     p2 = data[0] ^ data[1] ^ data[3]
-    p3 = data[0] ^ data[2] ^ data[3]
-    return [data[0],data[1], data[2], data[3], p1, p2, p3]
+    p3 = data[0] ^ data[2] ^ data[1]
+    return [p1, p2, data[3], p3, data[2], data[1], data[0]]
 
-def hamming74_decode(sequence):
+def hamming74_decode(sequence, valid_sequence):
     # Check if sequence length is valid
     if len(sequence) != 7:
         raise ValueError("Invalid sequence length. Hamming(7,4) requires a sequence of 7 bits.")
 
+    # Extract data and parity bits
+    data = [sequence[6], sequence[5], sequence[4], sequence[2]]
+    received_parity = [sequence[0], sequence[1], sequence[3]]
+
     # Calculate parity bits
-    p1 = sequence[0]
-    p2 = sequence[1]
-    p3 = sequence[3]
+    c1 = received_parity[0] ^ data[3] ^ data[2] ^ data[0]
+    c2 = received_parity[1] ^ data[3] ^ data[1] ^ data[0]
+    c3 = received_parity[2] ^ data[2] ^ data[1] ^ data[0]
+    calculated_parity = [c1, c2, c3]
 
-    # Calculate data bits
-    d1 = sequence[2]
-    d2 = sequence[4]
-    d3 = sequence[5]
-    d4 = sequence[6]
+    # Compare calculated and received parity bits to find error bit
+    error_bit = 0
+    for i in range(3):
+        if calculated_parity[i] != 0:
+            error_bit += 2**i
 
+    # If there's an error, flip the error bit
+    if error_bit != 0:
+        # print(f"Error detected at bit {error_bit}. Correcting bit.")
+        # print(f"Received sequence: {sequence}")
+        sequence[error_bit - 1] ^= 1
+        # print(f"Corrected sequence: {sequence}")
+        # print(f"valid sequence: {valid_sequence}")
+        # print()
 
-    # Return decoded data bits
-    return d1, d2, d3, d4
+    # Return the corrected data bits
+    return [sequence[6], sequence[5], sequence[4], sequence[2]]
 
 def file_to_bits(file):
     with open(file, 'rb') as f:
@@ -114,24 +145,25 @@ def bits_to_file(bits, file):
         f.write(bytes)
 
 # no error control transmission simulation
-print("No error control transmission simulation:")
-simulate_file_transmission_no_error_control('Modulo2\ex1\sequence.txt', 0.1)
-simulate_file_transmission_no_error_control('Modulo2\ex1\sequence.txt', 0.2)
-simulate_file_transmission_no_error_control('Modulo2\ex1\sequence.txt', 0.5)
-simulate_file_transmission_no_error_control('Modulo2\ex1\sequence.txt', 0.6)
-print()
+print("No error control transmission simulation:\n") 
+simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.05) 
+simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.2) 
+# simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.5) 
+# simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.6) 
+print() 
+
 
 # repetition code 3,1 transmission simulation
-print("Repetition code 3,1 transmission simulation:")
-simulate_file_transmission_repetition_code('Modulo2\ex1\sequence.txt', 0.1)
-simulate_file_transmission_repetition_code('Modulo2\ex1\sequence.txt', 0.2)
-simulate_file_transmission_repetition_code('Modulo2\ex1\sequence.txt', 0.5)
-simulate_file_transmission_repetition_code('Modulo2\ex1\sequence.txt', 0.6)
+print("Repetition code 3,1 transmission simulation:\n")
+simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.05)
+simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.2)
+# simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.5)
+# simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.6)
 print()
 
 # hamming 7,4 transmission simulation
-print("Hamming 7,4 transmission simulation:")
-simulate_file_transmission_hamming74('Modulo2\ex1\sequence.txt', 0.1)
-simulate_file_transmission_hamming74('Modulo2\ex1\sequence.txt', 0.2)
-simulate_file_transmission_hamming74('Modulo2\ex1\sequence.txt', 0.5)
-simulate_file_transmission_repetition_code('Modulo2\ex1\sequence.txt', 0.6)
+print("Hamming 7,4 transmission simulation:\n")
+simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.05)
+simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.2)
+# simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.5)
+# simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.6)
