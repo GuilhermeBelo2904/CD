@@ -2,7 +2,7 @@ import os
 import random
 
 def compare_files(file_a, file_b):
-    with open(file_a, 'r') as fa, open(file_b, 'r') as fb:
+    with open(file_a, 'rb') as fa, open(file_b, 'rb') as fb:
         content_a = fa.read()
         content_b = fb.read()
     

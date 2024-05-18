@@ -14,8 +14,7 @@ def bsc_channel(sequence, p):
     return result
 
 #b)
-def simulate_transmission(length, p):
-    sequence = generate_sequence(length)
+def simulate_transmission(length, p, sequence):
     transmitted_sequence = bsc_channel(sequence, p)
     ber = sum(bit1 != bit2 for bit1, bit2 in zip(sequence, transmitted_sequence)) / length
     print(f"Sequence length: {length}, BER: {ber}")
@@ -35,8 +34,7 @@ simulate_sequence_transmission()
 #  Higher p would result in a higher BER, as more bits would be flipped during transmission.
 
 #c)
-def simulate_file_transmission(file_a, file_b):
-    p = 0.1 
+def simulate_file_transmission(file_a, file_b, p):
     sequences = [1024, 10240, 102400, 1024000]
     for length in sequences:
         transmitted_file_a, received_file_b = simulate_transmission(length, p)
@@ -46,9 +44,10 @@ def simulate_file_transmission(file_a, file_b):
 
         compare_files(file_a, file_b)
 
+        delete_file('file_a.txt')
+        delete_file('file_b.txt')
+
 print()
 print("File transmission simulation:")
 simulate_file_transmission('file_a.txt', 'file_b.txt')
 
-delete_file('file_a.txt')
-delete_file('file_b.txt')

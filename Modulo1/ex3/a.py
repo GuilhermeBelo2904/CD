@@ -39,11 +39,12 @@ def symbol_info_app(file_names, relative_path):
         if option.upper() == 'E':
             print("\n\nExiting...\n")
             break
-        elif not option.isdigit() or int(option) < 0 and int(option) >= len(file_names):
+        elif not option.isdigit() or int(option) < 0 or int(option) >= len(file_names):
             print("\nInvalid option. Please choose a valid number.")
             continue 
         else:
             option = int(option)
+            print(option)
             show_symbols_info(file_names[option], relative_path)   
              
             

@@ -75,7 +75,7 @@ def pair_test():
         print("Self Information: ", elem)
     top_n_elem = sorted(return_of.items(), key=lambda x: x[1], reverse=True)[:n]
     for elem in top_n_elem:
-        print("Element: ", elem[0], "Frequency: ", elem[1])
+        print("Element: ", elem[0], "Frequency:", (elem[1]*100), "%")
 
 
 pair_test()
