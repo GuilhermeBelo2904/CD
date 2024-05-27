@@ -116,7 +116,7 @@ def main():
         for name in generators:
             print(f"- {name}")
 
-        selected_generator = input("Digite o nome do gerador: ")
+        selected_generator = input("Digite o nome do gerador: ").upper()
         if selected_generator in generators:
             generator = generators[selected_generator]
         elif selected_generator == "":
