@@ -1,22 +1,6 @@
 from utils import burst_channel
 import os
 
-# def crc32(data):
-#     # Polinômio gerador CRC-32
-#     generator = 0x04C11DB7
-#     crc = 0xFFFFFFFF
-
-#     for byte in data:
-#         crc ^= (byte << 24)
-#         for _ in range(8):
-#             if crc & 0x80000000:
-#                 crc = (crc << 1) ^ generator
-#             else:
-#                 crc <<= 1
-#         crc &= 0xFFFFFFFF
-
-#     return crc
-
 def crc_generic(data, generator = 0x04C11DB7):
     crc = 0xFFFFFFFF
 
@@ -62,47 +46,6 @@ def test_burst_channel(p, burst_length, generator):
     burst_data = bits_to_bytes(burst_data_binary)
     return check_crc(burst_data)
 
-# generator = 0x04C11DB7 # CRC-32
-
-# # Testando diferentes valores de p e burst_length
-# params = [
-#     (0.1, 5), 
-#     (0.2, 5), 
-#     (0.1, 2), 
-#     (0.2, 2), 
-#     (0, 5),
-#     ]
-# results = []
-
-# for p, burst_length in params:
-#     result = test_burst_channel(p, burst_length, generator)
-#     results.append((p, burst_length, result))
-
-# print("Resultados dos testes:")
-# for p, burst_length, result in results:
-#     print(f"p={p}, burst_length={burst_length}, CRC check passed: {result}")
-
-
-# # Simulating a burst error
-# def introduce_burst_error(data_bits, burst_length, start_index):
-#     # Introduce a burst error of length `burst_length` starting at `start_index`
-#     error_bits = list(data_bits)
-#     for i in range(start_index, start_index + burst_length):
-#         error_bits[i] = '1' if error_bits[i] == '0' else '0'  # Flip the bit
-#     return ''.join(error_bits)
-
-# # Inducing a specific burst error that we want to be undetectable
-# burst_length = 4  # Length of the burst error
-# start_index = len(data_block) - 32 - burst_length  # Start near the end but before the CRC
-
-# burst_data_binary = introduce_burst_error(data_block, burst_length, start_index)
-# print(f"Burst data binary: {burst_data_binary}\n")
-
-# burst_data = bits_to_bytes(burst_data_binary)
-# print(f"Burst data: {burst_data.hex()}\n")
-# crc_check = check_crc(burst_data)
-# print(f"Check CRC: {crc_check}")
-
 def main():
     generators = {
         "CRC-8": 0x07,
@@ -111,15 +54,22 @@ def main():
         "CRC-64-ISO": 0x1B
     }
 
+    generators_code = {
+        "1": "CRC-8",
+        "2": "CRC-16-IBM",
+        "3": "CRC-32",
+        "4": "CRC-64-ISO"
+    }
+
     while True:
         print("\nSelecione o gerador de CRC:")
-        for name in generators:
-            print(f"- {name}")
+        for code, generator in generators_code.items():
+            print(f"{code}: {generator}")
 
-        selected_generator = input("Digite o nome do gerador: ").upper()
-        if selected_generator in generators:
-            generator = generators[selected_generator]
-        elif selected_generator == "":
+        select_code = input("Digite o nome do gerador: ").upper()
+        if select_code in generators_code:
+            generator = generators[generators_code[select_code]]
+        elif select_code == "":
             break
         else:
             print("Gerador inválido! Tente novamente.")
