@@ -39,8 +39,8 @@ def check_crc(data):
 block_size = 1024 // 8
 data_block = os.urandom(block_size)
 
-def test_burst_channel(p, burst_length, generator):
-    crc_data = apply_crc(data_block, generator)
+def test_burst_channel(p, burst_length, generator, data=data_block):
+    crc_data = apply_crc(data, generator)
     file_to_bits = bytes_to_bits(crc_data)
     burst_data_binary = burst_channel(file_to_bits, p, burst_length)
     burst_data = bits_to_bytes(burst_data_binary)
