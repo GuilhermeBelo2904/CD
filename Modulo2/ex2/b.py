@@ -66,7 +66,7 @@ def main():
         for code, generator in generators_code.items():
             print(f"{code}: {generator}")
 
-        select_code = input("Digite o nome do gerador: ").upper()
+        select_code = input("Digite o numero do gerador: ").upper()
         if select_code in generators_code:
             generator = generators[generators_code[select_code]]
         elif select_code == "":
