@@ -4,7 +4,7 @@ char lastNumber = '\0';
 int lastInt = 0;
 
 char calculateChecksum(char number1, char number2) {
-  return (char)((~(number1 + number2)) && 0xFF);
+  return ((~(number1 + number2)) & 0xFF);
 }
 
 bool isPrime(int number) {
