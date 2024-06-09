@@ -58,25 +58,18 @@ def burst_channel(sequence, p, burst_length):
     return result
 
 
-def test_burst_channel(p, burst_length, data):
-    burst_data = burst_channel(data, p, burst_length)
-    burst_data_bytes = bits_to_bytes(burst_data)[2:][:-2]
-    data_without_checksum = make_data_without_checksum(burst_data_bytes)
-    data_with_checksum = make_data_with_checksum(data_without_checksum)
-    return check_ip_checksum(burst_data_bytes, data_with_checksum)
-
-
 def check_ip_checksum(burst_data, new_data):
     for i in range(2, len(burst_data), 3):
-            old_checksum = ord(burst_data[i])
-            new_checksum = ord(new_data[i])
+            old_checksum = burst_data[i]
+            new_checksum = new_data[i]
             if old_checksum != new_checksum:
                 return False
     return True
     
 
 def calculate_checksum(number1, number2):
-    return bytes(~(ord(number1) + ord(number2)) & 0xFF)
+    checksum = ~((int(chr(number1)) + int(chr(number2)) & 0xFF))
+    return (checksum & 0xFF).to_bytes(1, 'big')
 
 def make_data_without_checksum(burst_data_byte):
     data_without_checksum = bytearray()
@@ -87,14 +80,38 @@ def make_data_without_checksum(burst_data_byte):
 def make_data_with_checksum(data_without_checksum):
     data_with_checksum = bytearray()
     for i in range(0, len(data_without_checksum), 2):
-        checksum = calculate_checksum(data_without_checksum[i], data_without_checksum[i+1])
+        data = data_without_checksum[i]
+        data1 = data_without_checksum[i+1]
+        checksum = calculate_checksum(data, data1)
         data_with_checksum.extend(data_without_checksum[i:i+2])
         data_with_checksum.extend(checksum)
     return data_with_checksum
 
 
+def test_burst_channel(p, burst_length, data):
+    burst_data = burst_channel(data, p, burst_length)
+    burst_data_bytes = bits_to_bytes(burst_data)
+    test = bytearray()
+    for i in range(0, len(burst_data_bytes)):
+        element = burst_data_bytes[i]
+        if element != ord('\r') and element != ord('\n'):
+            test.append(burst_data_bytes[i])
+    burst_data_bytes = test
+    data_without_checksum = make_data_without_checksum(burst_data_bytes)
+    data_with_checksum = make_data_with_checksum(data_without_checksum)
+    return check_ip_checksum(burst_data_bytes, data_with_checksum)
+
+
+
 def test_bsc_channel(p, data):
     bsc_data = bsc_channel(data, p)
+    bsc_data_bytes = bits_to_bytes(bsc_data)
+    test = bytearray()
+    for i in range(0, len(bsc_data_bytes)):
+        element = bsc_data_bytes[i]
+        if element != ord('\r') and element != ord('\n'):
+            test.append(bsc_data_bytes[i])
+    bsc_data = test
     data_without_checksum = make_data_without_checksum(bsc_data)
     data_with_checksum = make_data_with_checksum(data_without_checksum)
     return check_ip_checksum(bsc_data, data_with_checksum)
