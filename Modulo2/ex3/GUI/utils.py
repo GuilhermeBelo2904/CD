@@ -60,36 +60,37 @@ def burst_channel(sequence, p, burst_length):
 
 def test_burst_channel(p, burst_length, data):
     burst_data = burst_channel(data, p, burst_length)
-    data_without_checksum = make_data_without_checksum(burst_data)
+    burst_data_bytes = bits_to_bytes(burst_data)[2:][:-2]
+    data_without_checksum = make_data_without_checksum(burst_data_bytes)
     data_with_checksum = make_data_with_checksum(data_without_checksum)
-    return check_ip_checksum(burst_data, data_with_checksum)
+    return check_ip_checksum(burst_data_bytes, data_with_checksum)
 
-
-def make_data_with_checksum(data):
-    return_data = []
-    for i in range(0, len(data), 2):
-        data1 = data[i]
-        data2 = data[i+1]
-        return_data += data[i:i+2]
-        new_checksum = ~(data1 + data2)
-        return_data += new_checksum
-    return return_data
 
 def check_ip_checksum(burst_data, new_data):
-    for i in range(2, len(burst_data), 4):
-            old_checksum = (burst_data[i] << 8) or burst_data[i+1]
-            new_checksum = (new_data[i] << 8) or new_data[i+1]
+    for i in range(2, len(burst_data), 3):
+            old_checksum = ord(burst_data[i])
+            new_checksum = ord(new_data[i])
             if old_checksum != new_checksum:
                 return False
     return True
     
 
-def make_data_without_checksum(data):
-    data_return
-    data_byte = bits_to_bytes(data)
-    for i in range(0, len(data_byte), 4):
-        data_return += data_byte[i:i+2]
-    return data_return
+def calculate_checksum(number1, number2):
+    return bytes(~(ord(number1) + ord(number2)) & 0xFF)
+
+def make_data_without_checksum(burst_data_byte):
+    data_without_checksum = bytearray()
+    for i in range(0, len(burst_data_byte), 3):
+        data_without_checksum.extend(burst_data_byte[i:i+2])
+    return data_without_checksum
+
+def make_data_with_checksum(data_without_checksum):
+    data_with_checksum = bytearray()
+    for i in range(0, len(data_without_checksum), 2):
+        checksum = calculate_checksum(data_without_checksum[i], data_without_checksum[i+1])
+        data_with_checksum.extend(data_without_checksum[i:i+2])
+        data_with_checksum.extend(checksum)
+    return data_with_checksum
 
 
 def test_bsc_channel(p, data):

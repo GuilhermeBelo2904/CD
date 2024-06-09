@@ -1,7 +1,7 @@
 import sys
 import serial
 import threading
-from utils import file_to_bits, bits_to_bytes, test_burst_channel, test_bsc_channel
+from utils import file_to_bits, test_burst_channel, test_bsc_channel
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QInputDialog, QMessageBox
 
 arduino_serial = serial.Serial('COM3', 9600)
@@ -128,3 +128,4 @@ def PrimeNumbersApp():
     sys.exit(app.exec_())
 
 PrimeNumbersApp()
+arduino_serial.close()
