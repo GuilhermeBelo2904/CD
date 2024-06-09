@@ -98,10 +98,9 @@ def PrimeNumbersApp():
             return
         
         probability /= 100.0 
-        generator = 0x04C11DB7
-        bytes_ = bits_to_bytes(file_to_bits("primes.txt"))
-        burst_test = test_burst_channel(probability, burst_length, generator, bytes_)
-        bsc_test = test_bsc_channel(probability, generator, bytes_)
+        bits = file_to_bits("primes.txt")
+        burst_test = test_burst_channel(probability, burst_length, bits)
+        bsc_test = test_bsc_channel(probability, bits)
 
         text_edit.append(f"Burst Channel Test: {'Passed' if burst_test else 'Failed'}")
         text_edit.append(f"BSC Channel Test: {'Passed' if bsc_test else 'Failed'}")

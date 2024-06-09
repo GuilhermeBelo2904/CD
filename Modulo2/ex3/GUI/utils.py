@@ -58,21 +58,45 @@ def burst_channel(sequence, p, burst_length):
     return result
 
 
-def test_burst_channel(p, burst_length, generator, data):
-    crc_data = apply_crc(data, generator)
-    file_to_bits = bytes_to_bits(crc_data)
-    burst_data_binary = burst_channel(file_to_bits, p, burst_length)
-    burst_data = bits_to_bytes(burst_data_binary)
-    return check_crc(burst_data)
+def test_burst_channel(p, burst_length, data):
+    burst_data = burst_channel(data, p, burst_length)
+    data_without_checksum = make_data_without_checksum(burst_data)
+    data_with_checksum = make_data_with_checksum(data_without_checksum)
+    return check_ip_checksum(burst_data, data_with_checksum)
 
 
-def test_bsc_channel(p, generator, data):
-    crc_data = apply_crc(data, generator)
-    file_to_bits = bytes_to_bits(crc_data)
-    bsc_data_file = bsc_channel(file_to_bits, p)
-    bsc_data = bits_to_bytes(bsc_data_file)
-    return check_crc(bsc_data)
+def make_data_with_checksum(data):
+    return_data = []
+    for i in range(0, len(data), 2):
+        data1 = data[i]
+        data2 = data[i+1]
+        return_data += data[i:i+2]
+        new_checksum = ~(data1 + data2)
+        return_data += new_checksum
+    return return_data
 
+def check_ip_checksum(burst_data, new_data):
+    for i in range(2, len(burst_data), 4):
+            old_checksum = (burst_data[i] << 8) or burst_data[i+1]
+            new_checksum = (new_data[i] << 8) or new_data[i+1]
+            if old_checksum != new_checksum:
+                return False
+    return True
+    
+
+def make_data_without_checksum(data):
+    data_return
+    data_byte = bits_to_bytes(data)
+    for i in range(0, len(data_byte), 4):
+        data_return += data_byte[i:i+2]
+    return data_return
+
+
+def test_bsc_channel(p, data):
+    bsc_data = bsc_channel(data, p)
+    data_without_checksum = make_data_without_checksum(bsc_data)
+    data_with_checksum = make_data_with_checksum(data_without_checksum)
+    return check_ip_checksum(bsc_data, data_with_checksum)
 
 
 def bsc_channel(sequence, p):
