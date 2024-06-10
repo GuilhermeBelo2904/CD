@@ -9,6 +9,7 @@ void setup() {
 }
 
 void loop() {
+  
   if (Serial.available() > 0 && !didPrint) {
     N = Serial.parseInt(); 
     printPrimes(N);
