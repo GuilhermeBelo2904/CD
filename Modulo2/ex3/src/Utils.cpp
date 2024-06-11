@@ -40,7 +40,7 @@ void printPrimes(int N) {
         break;  
     }
     Serial.print(checksumStr);
-    delay(4000);
-   // flag = false;
+    Serial.print("\n");
+    flag = false;
   }
 }

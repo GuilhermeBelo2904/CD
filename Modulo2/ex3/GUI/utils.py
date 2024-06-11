@@ -70,7 +70,7 @@ def make_data_with_checksum(data_without_checksum):
     i = 0
     while i < len(data_without_checksum):
         data_with_checksum.append(data_without_checksum[i])
-        checksum += ord(data_without_checksum[i])
+        checksum += data_without_checksum[i]
         i += 1
 
     checksum = str(~(checksum) & 0xFF)
@@ -91,7 +91,7 @@ def test_burst_channel(p, burst_length, data):
     test = bytearray()
     for i in range(0, len(burst_data_bytes)):
         element = burst_data_bytes[i]
-        if element != ord('\r'):
+        if element != ord('\r') and element != ord('\n'):
             test.append(burst_data_bytes[i])
     burst_data_bytes = test
     data_without_checksum = make_data_without_checksum(burst_data_bytes)
@@ -105,7 +105,7 @@ def test_bsc_channel(p, data):
     test = bytearray()
     for i in range(0, len(bsc_data_bytes)):
         element = bsc_data_bytes[i]
-        if element != ord('\r'):
+        if element != ord('\r') and element != ord('\n'):
             test.append(bsc_data_bytes[i])
     bsc_data = test
     data_without_checksum = make_data_without_checksum(bsc_data)
