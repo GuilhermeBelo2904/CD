@@ -47,36 +47,10 @@ def test_burst_channel(p, burst_length, generator, data=data_block):
     return check_crc(burst_data)
 
 def main():
-    generators = {
-        "CRC-8": 0x07,
-        "CRC-16-IBM": 0x8005,
-        "CRC-32": 0x04C11DB7,
-        "CRC-64-ISO": 0x1B
-    }
-
-    generators_code = {
-        "1": "CRC-8",
-        "2": "CRC-16-IBM",
-        "3": "CRC-32",
-        "4": "CRC-64-ISO"
-    }
-
+    generator = 0x04C11DB7
     while True:
-        print("\nSelecione o gerador de CRC:")
-        for code, generator in generators_code.items():
-            print(f"{code}: {generator}")
-
-        select_code = input("Digite o numero do gerador: ").upper()
-        if select_code in generators_code:
-            generator = generators[generators_code[select_code]]
-        elif select_code == "":
-            break
-        else:
-            print("Gerador inválido! Tente novamente.")
-
         p = float(input("Digite o valor de p (probabilidade de erro) entre 0 e 1: "))
         burst_length = int(input("Digite o comprimento do burst: "))
-
         result = test_burst_channel(p, burst_length, generator)
         print(f"p={p}, burst_length={burst_length}, CRC check passed: {result}")
 

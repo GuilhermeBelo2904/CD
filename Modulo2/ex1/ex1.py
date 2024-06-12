@@ -8,15 +8,24 @@ from utils import repetition_code_codificator
 
 import random
 
+def bits_to_file(bits, file):
+    byte_strings = [bits[i:i+8] for i in range(0, len(bits), 8)]
+    bytes = bytearray(int(byte_string, 2) for byte_string in byte_strings)
+
+    with open(file, 'wb') as f:
+        f.write(bytes)
+
 def ber_calculation(sequence, transmitted_sequence):
     return sum(bit1 != bit2 for bit1, bit2 in zip(sequence, transmitted_sequence)) / len(sequence)
 
 def simulate_file_transmission_no_error_control(file, p):
     print(f"p: {p}")
     file_content = file_to_bits(file)
-    write_sequence_to_file("sequenceBits.txt", file_content)
+    bits_to_file(file_content, "sequenceBits.txt")
+    #write_sequence_to_file("sequenceBits.txt", file_content)
     bsc_sequence = bsc_channel(file_content, p)
-    write_sequence_to_file("received_sequence.txt", bsc_sequence)
+    bits_to_file(bsc_sequence, "received_sequence.txt")
+    #write_sequence_to_file("received_sequence.txt", bsc_sequence)
     ber_line = ber_calculation(file_content, bsc_sequence)
     print(f"BER': {ber_line}")
     compare_files("sequenceBits.txt", "received_sequence.txt")
@@ -26,11 +35,13 @@ def simulate_file_transmission_no_error_control(file, p):
 def simulate_file_transmission_repetition_code(file, p):
     print(f"p: {p}")
     file_content = file_to_bits(file)
-    write_sequence_to_file("sequenceBits.txt", file_content)
+    bits_to_file(file_content, "sequenceBits.txt")
+    #write_sequence_to_file("sequenceBits.txt", file_content)
     codified_sequence = repetition_code_codificator(file_content)
     bsc_sequence = bsc_channel(codified_sequence, p)
     received_sequence = repetition_code_decoder(bsc_sequence)
-    write_sequence_to_file("received_sequence.txt", received_sequence)
+    bits_to_file(received_sequence, "received_sequence.txt")
+    #write_sequence_to_file("received_sequence.txt", received_sequence)
     ber_line = ber_calculation(file_content, received_sequence)
     print(f"BER': {ber_line}")
     ber = ber_calculation(codified_sequence, bsc_sequence)
@@ -42,7 +53,8 @@ def simulate_file_transmission_repetition_code(file, p):
 def simulate_file_transmission_hamming74(file, p):
     print(f"p: {p}")
     file_content = file_to_bits(file)
-    write_sequence_to_file("sequenceBits.txt", file_content)
+    bits_to_file(file_content, "sequenceBits.txt")
+    #write_sequence_to_file("sequenceBits.txt", file_content)
     codified_sequence = hamming74_encode_sequence(file_content)
     bsc_sequence = bsc_channel(codified_sequence, p)
     received_sequence = hamming74_decode_sequence(bsc_sequence, codified_sequence)
@@ -50,7 +62,8 @@ def simulate_file_transmission_hamming74(file, p):
     print(f"BER': {ber_line}")
     ber = ber_calculation(codified_sequence, bsc_sequence)
     print(f"BER: {ber}")
-    write_sequence_to_file("received_sequence.txt", received_sequence)
+    bits_to_file(received_sequence, "received_sequence.txt")
+    #write_sequence_to_file("received_sequence.txt", received_sequence)
     compare_files("sequenceBits.txt", "received_sequence.txt")
     print()
 
@@ -146,20 +159,21 @@ def bits_to_file(bits, file):
 
 # no error control transmission simulation
 print("No error control transmission simulation:\n") 
-simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.05) 
+simulate_file_transmission_no_error_control('Modulo2/ex1/sequencia.txt', 0.05) 
 simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.2) 
-# simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.5) 
-# simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.6) 
+simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.5) 
+simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.6) 
 print() 
 
 
 # repetition code 3,1 transmission simulation
 print("Repetition code 3,1 transmission simulation:\n")
-simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.05)
+simulate_file_transmission_repetition_code('Modulo2/ex1/sequencia.txt', 0.05)
 simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.2)
-# simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.5)
-# simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.6)
+simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.5)
+simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.6)
 print()
+
 
 # hamming 7,4 transmission simulation
 print("Hamming 7,4 transmission simulation:\n")
