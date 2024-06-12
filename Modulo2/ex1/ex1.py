@@ -159,25 +159,25 @@ def bits_to_file(bits, file):
 
 # no error control transmission simulation
 print("No error control transmission simulation:\n") 
-simulate_file_transmission_no_error_control('Modulo2/ex1/sequencia.txt', 0.05) 
+simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.01) 
+simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.05) 
+simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.1) 
 simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.2) 
-simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.5) 
-simulate_file_transmission_no_error_control('Modulo2/ex1/sequence.txt', 0.6) 
 print() 
 
 
 # repetition code 3,1 transmission simulation
 print("Repetition code 3,1 transmission simulation:\n")
-simulate_file_transmission_repetition_code('Modulo2/ex1/sequencia.txt', 0.05)
+simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.01)
+simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.05)
+simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.1)
 simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.2)
-simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.5)
-simulate_file_transmission_repetition_code('Modulo2/ex1/sequence.txt', 0.6)
 print()
 
 
 # hamming 7,4 transmission simulation
 print("Hamming 7,4 transmission simulation:\n")
+simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.01)
 simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.05)
+simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.1)
 simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.2)
-# simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.5)
-# simulate_file_transmission_hamming74('Modulo2/ex1/sequence.txt', 0.6)

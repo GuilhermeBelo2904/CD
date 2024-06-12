@@ -49,8 +49,15 @@ def test_burst_channel(p, burst_length, generator, data=data_block):
 def main():
     generator = 0x04C11DB7
     while True:
-        p = float(input("Digite o valor de p (probabilidade de erro) entre 0 e 1: "))
-        burst_length = int(input("Digite o comprimento do burst: "))
+        inputVal = ""
+        inputVal = input("Digite o valor de p (probabilidade de erro) entre 0 e 1: ")
+        if inputVal == "":
+            break
+        p = float(inputVal)
+        inputVal = input("Digite o comprimento do burst: ")
+        if inputVal == "":
+            break
+        burst_length = int(inputVal)
         result = test_burst_channel(p, burst_length, generator)
         print(f"p={p}, burst_length={burst_length}, CRC check passed: {result}")
 

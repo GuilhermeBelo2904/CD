@@ -1,11 +1,6 @@
 #include "Utils.hpp"
 
-char lastNumber = '\0';
-int lastInt = 0;
-
-char calculateChecksum(char number1, char number2) {
-  return ((~(number1 + number2)) & 0xFF);
-}
+bool flag = true;
 
 bool isPrime(int number) {
     if (number <= 1) {
@@ -19,37 +14,33 @@ bool isPrime(int number) {
     return true;
 }
 
+
 void printPrimes(int N) {
-  while(true){
-  Serial.print("\n");  
-  for (int i = 2; i <= N; i++) {
-    if (isPrime(i)) {
-      lastInt = i;
-      String primeNumber = String(i);
-      for (size_t j = 0; j < primeNumber.length(); j++) {
-        if (lastNumber != '\0') {
-          Serial.print(lastNumber);
-          Serial.print(primeNumber[j]);
-          Serial.print(calculateChecksum(lastNumber, primeNumber[j]));
-          lastNumber = '\0';
-        } else {
-          lastNumber = primeNumber[j];
-        }
+  delay(3000);
+  while(flag) {
+    int checksum = 0;
+    for (int i = 2; i <= N; i++) {
+      if (isPrime(i)) {
+          String prime = String(i);
+          for (size_t j = 0; j < prime.length(); j++) {
+            Serial.print(prime[j]);
+            checksum += prime[j];
+          }
+          Serial.print(" ");
+          checksum += 32;
       }
     }
-  } 
-  if (lastNumber != '\0') {
-    Serial.print(lastNumber);
-    Serial.print('\0'); 
-    Serial.print(calculateChecksum(lastNumber, '\0'));
-    lastNumber = '\0';
-  }
-  delay(4000);
+    String checksumStr = String(~(checksum) & 0xFF);
+    switch (checksumStr.length()) {
+      case 1:
+        Serial.print("00");
+        break;
+      case 2: 
+        Serial.print("0");
+        break;  
+    }
+    Serial.print(checksumStr);
+    Serial.print("\n");
+    flag = false;
   }
 }
-
-
-
-
-
-
