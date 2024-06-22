@@ -1,5 +1,6 @@
 import sys
 import serial
+import time
 import threading
 from utils import file_to_bits, test_burst_channel, test_bsc_channel
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QInputDialog, QMessageBox
@@ -28,15 +29,29 @@ def PrimeNumbersApp():
             else:
                 text_edit.append("Invalid input. Please enter a positive integer.")
 
-    def read_serial_data():
+    def read_serial_data(timeout=5):
         global recording
-        with open("primes.txt", "w") as file:
+        canContinue = False
+        with open("primes.txt", "wb") as file:
             while recording:
-                if arduino_serial.in_waiting > 0:
-                    serial_data = arduino_serial.readline().decode().strip()
-                    file.write(serial_data + "\n")
-                    text_edit.append(serial_data)
-                    app.processEvents() 
+                loop_start_time = time.time() 
+                while time.time() - loop_start_time <= timeout:  
+                    if arduino_serial.in_waiting > 0:
+                        serial_data = arduino_serial.read()
+                        file.write(serial_data)
+                        app.processEvents()
+                        canContinue = True
+                        break
+                    else:
+                        time.sleep(0.01)  
+                        
+                if not canContinue:
+                    recording = False
+                    break
+                    
+                canContinue = False 
+                   
+        text_edit.append("Data recording completed.")         
 
     def start_recording():
         global recording
@@ -79,7 +94,7 @@ def PrimeNumbersApp():
             text_edit.append("Recording stopped.")
             recording = False
             show_error_detection_prompt()
-
+            
     def show_error_detection_prompt():
         reply = QMessageBox.question(window, 'Error Detection', 'Do you want to perform error detection using IP Checksum?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
